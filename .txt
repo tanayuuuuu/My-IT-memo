@@ -1,0 +1,240 @@
+・render　と　redirect_toの違い
+
+・ブロック変数について
+　do ~endの中で＠〇〇〇の変わりに使う変数
+　＠あああの代わりにそのend	までは｜ｆ｜を使う
+
+・インスタンス変数の使い方
+　htmlファイル内に２つあればそれぞれ対応する
+インスタンス変数（＠book or @books)をコントローラーで定義しないと使えない。
+
+・更新時URL欄に数字だけ増えるのは、そのページ固有のIDという意味
+　→つまりそのページは詳細画面→Showということ
+　例え　redirect_to book_path(book.id)
+　showアクションのパス（book_path）に固有IDを引数として渡す
+
+・render使用の際はrenderに代入する変数を指定する。
+　アクションは飛び越えるイメージ
+
+・createアクションで変数を使っていても
+　render使用時などviewにエラーメッセージを表示させるように仕様変更するときは変数をインスタンス変数に変更する。
+　表示先のhtmlに存在している変数の数と種類は合わせる必要がある。
+
+・変更やテストコード追記したときはとりあえず保存しましょう！！
+
+・undefined local variable or method `root_path' for
+　root :to =>　で/のルーティングを追記し、pathを作成する。
+　（Prefixの空白はパスがない証拠）
+
+・モデル作成するとマイグレーションファイルの中には自動生成されるもの（id,created_at, updated_at）がある。※schemaで確認してもidは出てこない！！
+・名前付きルートはURLを簡単にすることが出来る。※自動作成されたURLが長い場合名前付きで設定した名前に変更可能
+
+・dependent: :destroyが消去されると誰が投稿したかわからなくなり1：Nの１側が削除されたときにエラーとなる。
+
+・コントローラー作成時は命名規則により複数形にせよ！！！！！
+
+・each文についてtitle
+　＠AAAAに入った変数をブロック変数｜ｆ｜に入れる。（＠ＡＡＡＡにはいくつものカラムのデータがある。「id:1 id:2 id:3～」）
+　＠AAAAのデータを1つづつ取り出し｜ｆ｜に代入しdo～endまでを実行。
+　id:1がすべての処理を実行し終えたら、id:2がdo～endを実行する。
+  ＠AAAAの中にあるidデータがすべて処理を終えたら終了となる。
+
+・paramsはURLの情報を取得してきている
+
+・ <% if @user.id == current_user.id %>　←　idとid　もし、idではなく全情報で比較したければ@user. == current_user　左右を合わせる！！
+
+・routes.rbに記載する縦順↓で　rails routes	の記載が上から↓の順になるため、ルーティングエラーの時などは別のパスに吸われてないかを確認する！（rails routesの表示上から下で処理される）
+
+　<p>投稿ユーザー画像:<%= image_tag post_image.user.get_profile_image(100,100) %></p>
+　　　　　　　　　　　　　　　　　　　　↑↑↑↑↑
+　上記の意味：imade_tag(メソッドである)　post_image.user（投稿したuserにそいつが投稿した画像データpost_imageがつながっている。ex：1ユーザーに対し３投稿 1対Nの関係）
+　get_profile_image　モデルで定義したアクション（プロフィール画像を持ってくる）
+
+・ルーティングのネストについて
+　ex:resources :post_images, only: [:new, :index, :create, :show, :destroy] do
+      resources :post_comments, only: [:create]
+     end
+     ↑↑↑このように記載することでURLがどの画像データに対するコメントかが分かるようになる。　→　URL:images/1/post_comment/1(入れ子のURLになりわかりやすい)
+
+・rails c  PostImage.all でID検索　IDは消されたからと言って繰り上がるわけではない
+
+・binding.pryがコード内に残っているとページ読み込みができない。（エラーにもならずにただ読み込めない）
+
+・routes.erbに記載する　resource　resourcesは「s」をつけることでidを受け渡しできるようになる。
+
+・例えばユーザーのshowページに表示させるときの変数の定義は必ずユーザーコントローラーのshowに定義する！　→　使用する変数が本（book）のものであっても。
+                                                                                                                       ↑↑↑
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　アソシエーション時
+
+・link_to の後ろは通常　”投稿”のように表示させたい内容を記載するが、投稿されたタイトル等にリンクをつけたいときはbook.titleのように記載する。
+　また、link_toの決まりに沿って書かないとパスがあっていても変な表示となり正しく処理されない。
+
+・<% @books.each do |book| %>
+　<%= image_tag book.user.get_profile_image(100,100) %>
+　　　　　　　　　↑↑↑
+　　　　　　　この矢印はブロック変数のbook
+　　　　　　　ここを@booksにすると中身は→＠book = Book.newなので（newはカラ)なにも渡すものがないnillの状態
+
+・部分テンプレートは調べればできました！！22/5/18
+
+・link_to 削除するときは<%= link_to "Destroy", book_path, method: :delete, "data-confirm" => "本当に消しますか？" %>
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　↑↑↑↑↑↑
+　　　　　　　　　　　　　　　　　　　　　　　　rails routesのdestroyに対応するパスを記入する　→　飛びたい先のパスはコントローラーのdef destroyにredirect先として記入
+・カラムの追加コマンドはしっかりと命名規則にのっとって行う。
+　追加されたマイグレーションファイルのアクションUPは自由にカラム名等を決めれるが、Changeは自由に決めれず、規則にのっとらなければならない
+　
+・before_action :authenticate_user!等のdeviseのメソッドのような共通して使用するものはアプリケーションコントローラーに記述する。
+
+・binding.pryそこで処理が止まる。rails sで止めたところの処理を行ったときにターミナル上でもブラウザでも止まる。そこで何が見たいかを記入するなど色々な使用方法がある。
+
+・/rails/info/routesをURLに記載して検索するとルーティングが確認できる。
+
+・form_withは打ち込んだ情報を保存しないときはform_with url パス　~/　保存するときはform_with model　モデルクラスのインスタンス
+
+・ディベロッパーツール　→　コンソール　でフロントのエラーが確認できる。
+
+・ .container+"tabキー" で<div　class="container"></div>が生成される。
+
+・  comment = current_user.post_comments.new(post_comment_params)
+　　　　　　　　　　　　　　　　　↑↑↑
+　　上記と　comment = PostComment.new(post_comment_params)
+ 	      comment.user_id = current_user.id  は同じ意味
+
+・マイグレーションファイルの削除は rails db:migrate:statusでstatusがdownになっているのを確認してから行う。
+　また、すでにschemaに更新されているマイグレーションファイルは一度rails db:rollbackしてからdownに変更してから更新し、再度rails db:migrateを行う。
+　（2つ分前に戻るときは rails db:rollback STEP＝2) マイグレーション及びDBの扱いはGit hubに似ている。
+   指定する場合は　→　rails db:migrate:down VERSION=20220617060526
+
+・コントローラーに記載する際、上から下に読まれているため上で書いたものが
+　下で読まれてリセットしてしまい、発火しないことがある。　（例：評価機能の時のindex)
+
+・遷移先でリロードしないと何かが発火しないときは遷移前のlink_toに
+　ターボリンクスを無効にする記述をすればOK↓
+　　　　　　　　　　　　　　　　　　data:{"turbolinks" => false}
+　　　　　　　　　　　　　　　　
+ ・railsにjavascriptを読み込ませる方法
+　①javascript/packs/application.jsに　import "ファイル名.js"or import "ファイル名/ファイル名.js"と記載
+
+　②ビューのＨＴＭＬファイル内に　<%= javascript_pack_tag "ファイル名" %> を挿入する。（.jsの拡張子はいらない）
+　　他の例：<%= javascript_pack_tag "packs以下のファイル名/ファイル名" %>
+  ③ＣＤＮで読み込む　→　ビューファイルにscriptタグを埋め込む
+　　<script src="http://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+　②と③の記述の順番に注意　※③が上
+
+ ・Turbolinksについて
+　　画面遷移を高速化してくれるjavascriptのライブラリ
+　　仕組み：aタグをクリックしたことを起点として起動　→　遷移元headタグと遷移先headタグに差分があればそれを取り込む
+　　→　遷移元bodyタグの中身を遷移先bodyタグの中身と置き換える　→　つまりaタグをクリックして遷移先ページを1から読み込んでいるわけではない！
+
+ ・カラムの追加　例：rails g migration AddStatusToMicroposts status:string　	（rails g migration Addカラム名Toテーブル名 カラム名:データ型）
+　　　　　　削除　 rails generate migration Removeカラム名Fromテーブル名 カラム名:データ型
+			rails generate migration RemoveAuthorFromTitles author:string
+
+
+ ・ER図作成のコツ　まず要件と機能一覧を明確化する。
+　機能一覧を見ながら、ECサイトであれば使っていくシナリオを順序立てて考えていく。
+　ex.ECサイト作成→商品を登録しないと販売できない→管理者登録用のテーブル→商品登録用のテーブルのような考え方。
+
+　・DB　INDEXは特定のカラムに対して張る。図書館で背表紙があれば探しやすいよね？という考え方。
+　　
+
+  ・git pull origin develop　←　developのバージョンを自分のところにプルするという意味
+　・git push origin [自分のブランチ]　←　Github上に今こうなってます！と情報を更新する。
+
+　・アソシエーションしているときの画像表示方法
+　　 <%= cart_item.item.name %></td>　←最後はカラムで終わる
+
+  ・GeocorderAPIから情報を取得、GEMは情報を渡すのではなく、APIからの情報を使用する際に
+　　JSが書けるなら書く、書けないならGEMを使た方が楽やんね、てゆー考え方。
+
+　・<div id='map'></div>
+　　の中身は
+　　→  let map = new google.maps.Map(document.getElementById('map'), {
+    getEkementByで要素を取得して、'mapに入れている'
+
+  ・JSとrailsを混同して記載するときは書き方に注意
+　　ex.if文　if（<%=%）{
+    };　　のような書き方
+
+　・アプリケーション.htmlにJSを記載するのもありだが、JSのみの内容で全ページ共通であればapplication.jsに記載すればpackで読んでくれる。
+
+　・アプリケーション.htmlに書いていると全ページで読まれてしまうため、あまりよくないが
+　 current_page? urlで今表示されているURLのときだけ読み込ませる方法がある。
+　　引数でユーザーIDが必要なページはログアウトするとエラーが起きるため、signed_in? &&とすれば解決
+　
+　・inport" " と　=//requireは同じ意味　（rails4ぐらいの時はbootstrapも=//bootstrapだった）
+　　
+　・アプリケーション.htmlと別ページにスクリプトタグでJSの内容を記載すると
+　　ターボリンクスの読み込みで２回読み込みエラーとなってしまう。
+
+　・Uncaught SyntaxError: Identifier 'infowindow' has already been declared
+    JSの変数が２回宣言されているという意味だが二回書かれてなくても、２回読み込まれればエラーとなる。
+　　その場合再宣言できる変数宣言であるvarに書き換えてみる
+
+　・' target='_blank'　はHTMLのプロパティでタブを複製させてページ遷移する役割
+
+ 　・a href=には＿pathは書けないため、URLを強引に　+　でつなげるかつ、IDのところは
+　　　+<%= post.id %> のような形でつなげる。
+
+　・UrlGenerationError
+　　No route matches {:action=>"new", :controller=>"posts", :user_id=>nil}, missing required keys: [:user_id]
+   ユーザーIDが無くてURLを生成できないというエラー
+　　条件分岐でcurrent_user.present?で存在していればそいつを実行すると記述すればエラーは免れる
+
+  ・params.requierのrequierはparamsと同じ→いらない！！！　byebugで確認すれば同じ　3層構造のイメージパラ・リク・パーミット
+　
+　・引数でuser.idとかuser_idとあるが＿アンダーバーはカラム名で、.どっとが使用できるのはルーティングでネストしているから　
+　　つまり、ネストしていてカラム（外部キー）があればどちらでもえらーはでない！！
+
+　・電話番号カラムはstringでデフォルト値を入れておく。
+　
+　・本番環境でのエラーはsudo tail -f log/production.logで確認する。
+　　経験エラー・.envでルーティングエラー　ログインページへの遷移でエラー
+　　本番でマイグレーションしたときに、過去のカラムをadd/removeしたときのマイグレーションファイルも読み込んでしまうため
+　　そこに誤字があるファイルがあるとそれを読み込んでエラーとなってしまう。その際はそのファイルを削除→プッシュ→本番でプル
+
+ ・sudoコマンドはroot権限で操作するときに使用する（開発ではEC2ユーザー）
+   しかし、現場に出ると誰にSUDOが使えるかの権限を付与するため、全員が使用できるわけではない
+   容量がいっぱいの場合、JSがコンパイルするときに作られるファイルがたまっていっている。（なぜかは不明）
+　　rails assets:clobber で削除できる。
+
+　・EC2へのログインコマンド　ssh -i ~/.ssh/practice-aws.pem ec2-user@18.183.108.0
+
+　・本番環境でのサーバー停止コマンド　ps aufx | grep pumaでプロセスIDを指定してkill -9 ******
+　　もしくは　sudo kill $(cat tmp/pids/puma.pid)　でプロセスIDの指定なしでOK
+ 
+  ・def destroyで変数を用意するときは	（例：投稿に紐づいたコメント削除のとき） @comment = Comment.find(params[:id])
+    post = @comment.post　←と書くから、引数にpost.idと書ける。←が無ければ、@comment.post_id
+
+  ・パラメーターがnilの時、URLを見て無いときにparamsを取得したいとき　@start = ((params[:page] || 1 )と記述すれば
+　　左のparams[:page]はnilだが　||またはで1を入れることが出来る。
+
+　・コントローラーで変数にparamsの値を入れるとき、paramsの中身は文字列のため
+　　.to_iでintegerに変換する必要がある。   Rubyではnilはfalseで返される。
+
+  ・コントローラーに　class User < ApplicationRecord
+　　　　　　　　　　　　def active_for_authentication?
+    　　　　　　　　　　　super && (self.is_deleted == false)
+  　　　　　　　　　　　end
+　　と、記述があればユーザークラスはApplicationRecordクラスを継承するという意味で
+　　　superにはすぐ上のdef active_for_authentication?が代入される。しかし、devise :database_authenticatable, :registerable,のようにデバイスが入っていればデバイスのメソッドを継承する。
+
+　・.envに記載したAPIキは.gitignoreに.envが記載しているため、本番環境のアプリにはgitpullしても上がってこない。普通にかんがえたら当たり前！
+　　なので、開発環境でscp -i ~/.ssh/practice-aws.pem .env ec2-user@IPアドレス:リポジトリ名/　で、EC2に送ってあげんとあかん！！
+
+　・bundle install系のコマンドは基本的には開発・本番両方で行わないといけない。
+
+  ・AIカリキュラムのVision.rbについて
+　　ドキュメントにはこういうリクエストを送るとこういうリクエストが返ってくるよということが載っている。
+　　出力のやり方は各言語の書き方があるため載っていない。
+　
+  ・raisl アプリがどのRDBを使用しているかの確認はconfig.database.ymlに記載されているが
+　　環境変数になって.envとあれば.envファイルに記載してある。
+　
+　・開発環境で新たにモデルを作成した際は開発環境で新たに以下のコマンドでマイグレーションを行う。
+　　bundle exec rails db:migrate RAILS_ENV=production　でないと、テーブルがありませんエラーになる。
+
+  ・Documents/SQL-leaning内に学習したコードをファイルとして保存する！　(cloud9以外のやり方)
+　　powershellを開いてコミットする
+ 　 cd ~/Documents/SQL-leaning
+    ここからgit add とか　commit, pushが出来る
