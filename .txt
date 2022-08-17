@@ -249,3 +249,5 @@
 　　from →　where　→ group by　→ having　→ select　→ order by　→ limit
    また、グループ化の時にselectで名前指定しているものをwhereで絞り込むことはできない（whereの命令がgroup byよりも先に行われるから）
 　　その際はhavingを使用。
+
+　・エルピック・CCNA（インフラエンジニア資格　取ったらいいよ的なやつです）
