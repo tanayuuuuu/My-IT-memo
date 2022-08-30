@@ -237,7 +237,12 @@
   ・Documents/SQL-leaning内に学習したコードをファイルとして保存する！　(cloud9以外のやり方)
 　　powershellを開いてコミットする
  　 cd ~/Documents/SQL-leaning
-    ここからgit add とか　commit, pushが出来る     
+    ここからgit add とか　commit, pushが出来る 
+
+  ・ノーコードではなく、ローコード
+　　　SPILAL　『顧客接点強化』と『業務効率化』に必要な業務アプリを構築運用できるローコード開発プラットフォーム
+　　　PIPED BITS
+　　　ローコード開発→部品を組み合わせる。    
    
    ・上記を自分でやってみたメモ
 　　※メモ帳の学習メモをGithubで管理
